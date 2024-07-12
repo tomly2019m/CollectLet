@@ -9,7 +9,9 @@ import (
 
 const statPath = "/proc/stat"
 
-func getCpuUsage() (float64, error) {
+type ComputeCollector struct{}
+
+func (cc *ComputeCollector) getCpuUsage() (float64, error) {
 	contents, err := os.ReadFile(statPath)
 	if err != nil {
 		return 0, err
