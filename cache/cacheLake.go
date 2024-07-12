@@ -25,9 +25,9 @@ func (l *Lake[T]) Get() (T, error) {
 }
 
 type DataItem struct {
-	name      string
-	timeStamp int64
-	value     string
+	Name      string
+	TimeStamp int64
+	Value     string
 }
 
 type ComputeCache struct {
