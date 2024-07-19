@@ -1,43 +1,125 @@
 package collector
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const statPath = "/proc/stat"
 
-func GetCpuUsage() (float64, error) {
-	contents, err := os.ReadFile(statPath)
-	if err != nil {
-		return 0, err
-	}
-
-	lines := strings.Split(string(contents), "\n")
-	for _, l := range lines {
-		fields := strings.Fields(l)
-		if fields[0] == "cpu" {
-			return calUsage(fields[1:])
-		}
-	}
-	return 0, errors.New("cpu info not found")
+type cpuUsage struct {
+	User      int64
+	Nice      int64
+	System    int64
+	Idle      int64
+	IOWait    int64
+	IRQ       int64
+	SoftIRQ   int64
+	Steal     int64
+	Guest     int64
+	GuestNice int64
 }
 
-func calUsage(fields []string) (float64, error) {
-	var total uint64
-	var idle uint64
-
-	for i, field := range fields {
-		val, err := strconv.ParseUint(field, 10, 64)
-		if err != nil {
-			return 0, err
-		}
-		total += val
-		if i == 3 {
-			idle = val
-		}
+func readCPUUsage() (cpuUsage, error) {
+	data, err := os.ReadFile(statPath)
+	if err != nil {
+		return cpuUsage{}, err
 	}
-	return 100 * (float64(total-idle) / float64(total)), nil
+
+	lines := strings.Split(string(data), "\n")
+	cpuLine := strings.Fields(lines[0])
+
+	if cpuLine[0] != "cpu" {
+		return cpuUsage{}, fmt.Errorf("unexpected format: %s", cpuLine[0])
+	}
+
+	user, err := strconv.ParseInt(cpuLine[1], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	nice, err := strconv.ParseInt(cpuLine[2], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	system, err := strconv.ParseInt(cpuLine[3], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	idle, err := strconv.ParseInt(cpuLine[4], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	ioWait, err := strconv.ParseInt(cpuLine[5], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	irq, err := strconv.ParseInt(cpuLine[6], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	softIRQ, err := strconv.ParseInt(cpuLine[7], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	steal, err := strconv.ParseInt(cpuLine[8], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	guest, err := strconv.ParseInt(cpuLine[9], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+	guestNice, err := strconv.ParseInt(cpuLine[10], 10, 64)
+	if err != nil {
+		return cpuUsage{}, err
+	}
+
+	return cpuUsage{
+		User:      user,
+		Nice:      nice,
+		System:    system,
+		Idle:      idle,
+		IOWait:    ioWait,
+		IRQ:       irq,
+		SoftIRQ:   softIRQ,
+		Steal:     steal,
+		Guest:     guest,
+		GuestNice: guestNice,
+	}, nil
+}
+
+func calculateUsage(prev, current cpuUsage) float64 {
+	prevIdle := prev.Idle + prev.IOWait
+	idle := current.Idle + current.IOWait
+
+	prevNonIdle := prev.User + prev.Nice + prev.System + prev.IRQ + prev.SoftIRQ + prev.Steal
+	nonIdle := current.User + current.Nice + current.System + current.IRQ + current.SoftIRQ + current.Steal
+
+	prevTotal := prevIdle + prevNonIdle
+	total := idle + nonIdle
+
+	totald := total - prevTotal
+	idled := idle - prevIdle
+
+	return float64(totald-idled) / float64(totald) * 100
+}
+
+func GetCPUUsage(ch chan<- float64) {
+	prevUsage, err := readCPUUsage()
+	if err != nil {
+		fmt.Println(err)
+	}
+	//fmt.Println(config.Compute.Freq)
+	time.Sleep(time.Duration(config.Compute.Freq) * time.Millisecond)
+
+	currentUsage, err := readCPUUsage()
+	if err != nil {
+		fmt.Println(err)
+	}
+	cpuUsage := calculateUsage(prevUsage, currentUsage)
+	//fmt.Println(cpuUsage)
+	ch <- cpuUsage
 }

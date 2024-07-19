@@ -1,18 +1,20 @@
 package main
+
 import (
-	"CollectLet/cache"
-	"CollectLet/exporterApi"
-	"context"
+	"CollectLet/collector"
 	"fmt"
-	"log"
-	"os"
-	"os/signal"
-	"time"
 )
 
-
-
 func main() {
+
+	ch := make(chan float64)
+	go collector.GetCPUUsage(ch)
+	fmt.Println("other things")
+	cpuUsage := <-ch
+	fmt.Println(cpuUsage)
+
+	/**
+	// 对象转换******************************************************************************
 	lakeFactory := cache.NewLakeFactory()
 	// 获取 Compute Lake
 	computeLakeInterface, err := lakeFactory.GetObject("compute")
@@ -60,6 +62,8 @@ func main() {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
+	// ************************************************************************************************
+
 
 
 
@@ -79,5 +83,5 @@ func main() {
 	}
 	log.Println("Server exiting")
 	// *************************************************************************************************
-
+	**/
 }
