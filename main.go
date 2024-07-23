@@ -1,17 +1,30 @@
 package main
 
-import (
-	"CollectLet/collector"
-	"fmt"
-)
-
 func main() {
 
-	ch := make(chan float64)
-	go collector.GetCPUUsage(ch)
+	/**日志模块
+	Log := logger.GetLogger()
+	Log.Debug("Hello World")
+
+	// Log必须在最后调用WaitForDone方法，否则最后一条log会出现无法记录的情况。
+	Log.WaitForDone()
+	*/
+
+	/**
+	ch1 := make(chan float64)
+	ch2 := make(chan uint64)
+	go collector.GetCPUUsage(ch1)
+	go collector.GetTotalMemory(ch2)
+	go collector.GetFreeMemory(ch2)
+
 	fmt.Println("other things")
-	cpuUsage := <-ch
+	cpuUsage := <-ch1
+	totalMemory := <-ch2
+	FreeMemory := <-ch2
 	fmt.Println(cpuUsage)
+	fmt.Println(totalMemory)
+	fmt.Println(FreeMemory)
+	*/
 
 	/**
 	// 对象转换******************************************************************************
@@ -83,5 +96,5 @@ func main() {
 	}
 	log.Println("Server exiting")
 	// *************************************************************************************************
-	**/
+	*/
 }

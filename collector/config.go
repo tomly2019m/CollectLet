@@ -18,18 +18,18 @@ var configOnce sync.Once
 
 func loadConfig() {
 	byteValue, err := os.ReadFile("./config/collector.yaml")
-	fmt.Println(string(byteValue))
+	//fmt.Println(string(byteValue))
 	if err != nil {
 		fmt.Println(err)
 	}
 	err = yaml.Unmarshal(byteValue, &config)
-	fmt.Println(config.Compute.Freq)
+	//fmt.Println(config.Compute.Freq)
 	if err != nil {
 		fmt.Println("error parsing config.yaml")
 	}
 }
 
 func init() {
-	fmt.Println("init")
+	//fmt.Println("init")
 	configOnce.Do(loadConfig)
 }
