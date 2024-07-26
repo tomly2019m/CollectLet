@@ -1,6 +1,7 @@
 package exporterApi
 
 import (
+	"CollectLet/logger"
 	"errors"
 	"fmt"
 	"gopkg.in/yaml.v3"
@@ -8,6 +9,8 @@ import (
 	"net/http"
 	"os"
 )
+
+var logTag = "[apiServer]"
 
 type Config struct {
 	Server struct {
@@ -24,12 +27,12 @@ type HttpServer struct {
 func NewHttpServer() *HttpServer {
 	byteValue, err := os.ReadFile("./config/server.yaml")
 	if err != nil {
-		fmt.Println(err)
+		logger.GetLogger().Error("%s %s", logTag, err.Error())
 	}
 	var config Config
 	err = yaml.Unmarshal(byteValue, &config)
 	if err != nil {
-		fmt.Println("error parsing config.yaml")
+		logger.GetLogger().Error("%s %s", logTag, err.Error())
 	}
 	return &HttpServer{
 		mux: http.NewServeMux(),
@@ -44,7 +47,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("Hello World"))
 	if err != nil {
-		fmt.Println(err)
+		logger.GetLogger().Error("%s %s", logTag, err.Error())
 	}
 }
 
@@ -54,7 +57,7 @@ func (s *HttpServer) Start() {
 	go func() {
 		log.Printf("Starting server on %s\n", s.Server.Addr)
 		if err := s.Server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("ListenAndServe: %v", err)
+			logger.GetLogger().Fatal("%s ListenAndServe: %s", logTag, err.Error())
 		}
 	}()
 }

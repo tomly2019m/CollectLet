@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"CollectLet/logger"
 	"fmt"
 	"os"
 	"strconv"
@@ -9,6 +10,8 @@ import (
 )
 
 const statPath = "/proc/stat"
+
+var logTagCompute = "[computeCollector]"
 
 type cpuUsage struct {
 	User      int64
@@ -23,9 +26,14 @@ type cpuUsage struct {
 	GuestNice int64
 }
 
+func init() {
+	logTag = "[computeCollector]"
+}
+
 func readCPUUsage() (cpuUsage, error) {
 	data, err := os.ReadFile(statPath)
 	if err != nil {
+		logger.GetLogger().Error("%s %s", logTagCompute, err.Error())
 		return cpuUsage{}, err
 	}
 
@@ -33,6 +41,7 @@ func readCPUUsage() (cpuUsage, error) {
 	cpuLine := strings.Fields(lines[0])
 
 	if cpuLine[0] != "cpu" {
+		logger.GetLogger().Error("%s unexpected format: %s", logTagCompute, cpuLine[0])
 		return cpuUsage{}, fmt.Errorf("unexpected format: %s", cpuLine[0])
 	}
 
@@ -117,7 +126,7 @@ func GetCPUUsage(ch chan<- float64) {
 
 	currentUsage, err := readCPUUsage()
 	if err != nil {
-		fmt.Println(err)
+		logger.GetLogger().Error("%s %s", logTagCompute, err.Error())
 	}
 	cpuUsage := calculateUsage(prevUsage, currentUsage)
 	//fmt.Println(cpuUsage)

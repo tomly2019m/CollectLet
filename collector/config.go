@@ -16,6 +16,8 @@ type Config struct {
 var config Config
 var configOnce sync.Once
 
+var logTag string
+
 func loadConfig() {
 	byteValue, err := os.ReadFile("./config/collector.yaml")
 	//fmt.Println(string(byteValue))

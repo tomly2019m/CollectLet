@@ -5,8 +5,8 @@ func main() {
 	/**日志模块
 	Log := logger.GetLogger()
 	Log.Debug("Hello World")
-
-	// Log必须在最后调用WaitForDone方法，否则最后一条log会出现无法记录的情况。
+	Log.Info("Hello World %s", "a")
+	//Log必须在最后调用WaitForDone方法，否则最后一条log会出现无法记录的情况。
 	Log.WaitForDone()
 	*/
 
