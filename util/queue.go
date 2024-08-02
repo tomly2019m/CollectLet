@@ -8,21 +8,28 @@ import (
 
 var emptyQueueErr = errors.New("empty queue")
 
+const DefaultQueueSize = 20
+
 // Queue 线程安全的的泛型队列
 type Queue[T any] struct {
 	list  *list.List
+	size  int
 	mutex sync.Mutex
 }
 
 func NewQueue[T any]() *Queue[T] {
 	return &Queue[T]{
 		list: list.New(),
+		size: DefaultQueueSize,
 	}
 }
 
 func (q *Queue[T]) Push(item T) {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
+	if q.list.Len() >= q.size {
+		q.list.Remove(q.list.Front())
+	}
 	q.list.PushBack(item)
 }
 
@@ -57,6 +64,5 @@ func (q *Queue[T]) IsEmpty() bool {
 func (q *Queue[T]) Size() int {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
-	q.list.Len()
 	return q.list.Len()
 }

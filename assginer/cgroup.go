@@ -142,4 +142,14 @@ func (cg *CGroup) Apply() {
 	cg.setCPULimit()
 	cg.setMemoryLimit()
 	cg.setCPUCoresLimit()
+	cg.PidSet.Iterate(func(elem interface{}) {
+		pid, ok := elem.(int)
+		if !ok {
+			log.Error("%s %s", logTagCGroup, "error parsing pid")
+		}
+		err := addProcessToCgroup(filepath.Join(basePath, cg.Name), pid)
+		if err != nil {
+			log.Error("%s %s", logTagCGroup, err.Error())
+		}
+	})
 }

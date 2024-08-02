@@ -6,34 +6,34 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
-func GetTotalMemory(ch chan<- uint64) {
+func GetTotalMemory() uint64 {
 	virtualMemory, err := mem.VirtualMemory()
 	if err != nil {
 		fmt.Println(err)
 	}
-	ch <- virtualMemory.Total
+	return virtualMemory.Total
 }
 
-func GetUsedMemory(ch chan<- uint64) {
+func GetUsedMemory() uint64 {
 	virtualMemory, err := mem.VirtualMemory()
 	if err != nil {
 		fmt.Println(err)
 	}
-	ch <- virtualMemory.Used
+	return virtualMemory.Used
 }
 
-func GetFreeMemory(ch chan<- uint64) {
+func GetFreeMemory() uint64 {
 	virtualMemory, err := mem.VirtualMemory()
 	if err != nil {
 		fmt.Println(err)
 	}
-	ch <- virtualMemory.Available
+	return virtualMemory.Available
 }
 
-func GetFreeDiskSpace(ch chan<- uint64) {
+func GetFreeDiskSpace() uint64 {
 	usage, err := disk.Usage("/")
 	if err != nil {
 		fmt.Println(err)
 	}
-	ch <- usage.Free
+	return usage.Free
 }

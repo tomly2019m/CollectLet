@@ -25,9 +25,9 @@ func (l *Lake[T]) Get() (T, error) {
 }
 
 type DataItem struct {
-	Name      string
-	TimeStamp int64
-	Value     string
+	Name      string `json:"name"`
+	TimeStamp int64  `json:"timeStamp"`
+	Value     string `json:"value"`
 }
 
 type ComputeCache struct {
@@ -52,6 +52,14 @@ type LakeFactory struct {
 func NewLakeFactory() *LakeFactory {
 	return &LakeFactory{
 		lakes: make(map[string]interface{}),
+	}
+}
+
+func NewDataItem(name, value string) DataItem {
+	return DataItem{
+		Name:      name,
+		TimeStamp: util.GetTimeStamp(),
+		Value:     value,
 	}
 }
 

@@ -116,12 +116,11 @@ func calculateUsage(prev, current cpuUsage) float64 {
 	return float64(totald-idled) / float64(totald) * 100
 }
 
-func GetCPUUsage(ch chan<- float64) {
+func GetCPUUsage() float64 {
 	prevUsage, err := readCPUUsage()
 	if err != nil {
 		fmt.Println(err)
 	}
-	//fmt.Println(config.Compute.Freq)
 	time.Sleep(time.Duration(config.Compute.Freq) * time.Millisecond)
 
 	currentUsage, err := readCPUUsage()
@@ -129,6 +128,5 @@ func GetCPUUsage(ch chan<- float64) {
 		logger.GetLogger().Error("%s %s", logTagCompute, err.Error())
 	}
 	cpuUsage := calculateUsage(prevUsage, currentUsage)
-	//fmt.Println(cpuUsage)
-	ch <- cpuUsage
+	return cpuUsage
 }
