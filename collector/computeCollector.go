@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"CollectLet/constants"
 	"CollectLet/logger"
 	"fmt"
 	"os"
@@ -8,8 +9,6 @@ import (
 	"strings"
 	"time"
 )
-
-const statPath = "/proc/stat"
 
 var logTagCompute = "[computeCollector]"
 
@@ -31,7 +30,7 @@ func init() {
 }
 
 func readCPUUsage() (cpuUsage, error) {
-	data, err := os.ReadFile(statPath)
+	data, err := os.ReadFile(constants.StatPath)
 	if err != nil {
 		logger.GetLogger().Error("%s %s", logTagCompute, err.Error())
 		return cpuUsage{}, err

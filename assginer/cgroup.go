@@ -9,11 +9,6 @@ import (
 	"syscall"
 )
 
-const (
-	cpuLimitPercent = 1000
-	memLimitMB      = 1048576
-)
-
 var basePath = "/sys/fs/cgroup/"
 
 var log = logger.GetLogger()
