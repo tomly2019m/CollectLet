@@ -1,4 +1,4 @@
-module CollectLet
+module nodeExporter
 
 go 1.22
 

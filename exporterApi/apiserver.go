@@ -1,16 +1,16 @@
 package exporterApi
 
 import (
-	"CollectLet/cache"
-	"CollectLet/collector"
-	"CollectLet/constants"
-	"CollectLet/logger"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"log"
 	"net/http"
+	"nodeExporter/cache"
+	"nodeExporter/collector"
+	"nodeExporter/constants"
+	"nodeExporter/logger"
 	"os"
 )
 
